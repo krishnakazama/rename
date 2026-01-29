@@ -1,3 +1,8 @@
+library(tidyverse)
+library(Biostrings)
+library(stringr)
+
+
 setwd("set/working/directory")
 
 header_change <- function(input_file, output_file){
