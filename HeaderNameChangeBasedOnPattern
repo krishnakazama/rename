@@ -1,0 +1,37 @@
+setwd("set/working/directory")
+
+header_change <- function(input_file, output_file){
+  
+  seqs <- readDNAStringSet(input_file)
+  
+  filename <- tools::file_path_sans_ext(basename(input_file))
+  
+  original_header <- names(seqs)
+  
+  new_header <- sapply(original_header, function(header){
+    
+    # Extract cds_id
+    cds_match <- str_match(header, "cds_([A-Za-z0-9._]+)_\\d+\\s")
+    cds_id <- cds_match[, 2]  # Fixed: was cds_ids
+    
+    # Extract protein_id
+    protein_match <- str_match(header, "protein_id=([A-Za-z0-9._]+)\\]")
+    protein_id <- protein_match[, 2]  # Fixed: was protein_ids
+    
+    # Fixed: Changed cds_ids to cds_id and protein_ids to protein_id
+    paste(cds_id, protein_id, filename, sep = ", ")
+  })
+  
+  names(seqs) <- new_header
+  writeXStringSet(seqs, output_file)
+  return(seqs)
+}
+
+# Process all files
+name <- list.files(pattern = ".fasta", full.names = TRUE)
+
+for (i in name) {
+  outfile <- paste0("clean_", basename(i))  # Added underscore for clarity
+  header_change(i, outfile)
+  cat("Processed:", basename(i), "\n")  # Optional: track progress
+}
